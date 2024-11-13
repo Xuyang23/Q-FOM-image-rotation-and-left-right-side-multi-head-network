@@ -1,19 +1,17 @@
 from __future__ import print_function
-
 import os
 import sys
 import numpy as np
 from tensorflow.keras.optimizers import Adam
-from keras.layers import BatchNormalization, Dense, Dropout, Flatten, Input, Conv2D,MaxPooling2D
+from keras.layers import BatchNormalization, Dense, Dropout, Flatten, Input, Conv2D, MaxPooling2D
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
-
 
 # Add project directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import custom functions and utilities
-from utils import angle_error_regression, manual_train_test_split, load_and_pair_data,RotNetDataGenerator,binarize_images
+from utils import angle_error_regression, manual_train_test_split, load_and_pair_data 
 
 # Set paths for image directory and CSV file
 image_dir = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\STANDARDIZED\cut_masks"
@@ -21,8 +19,6 @@ csv_path = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\dataset_image_rota
 
 # Load and prepare the data
 images, angles = load_and_pair_data(image_dir, csv_path, target_size=(96, 128))
-
-
 
 X_train, X_test, y_train, y_test = manual_train_test_split(images, angles, test_size=0.2)
 
@@ -39,24 +35,19 @@ print(f"Testing labels shape: {y_test.shape}")
 # Model configuration
 model_name = 'rotnet_carcass_regression'
 
-
-def create_optimized_model(input_shape=(128, 96, 1), nb_filters=128, kernel_size=(5, 5), dropout_rate=0.01):
-    """
-    Creates a more complex CNN model for regression with added pooling layers, BatchNormalization, and Dropout.
-    The model is designed to handle a larger dataset.
-    """
+def create_optimized_model(input_shape=(128, 96, 1), nb_filters=128, kernel_size=(3, 3), dropout_rate=0.01):
     input_layer = Input(shape=input_shape)
 
     # First convolutional block with MaxPooling
     x = Conv2D(nb_filters, kernel_size, activation='relu')(input_layer)
     x = BatchNormalization()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)  # 添加 MaxPooling 层
+    x = MaxPooling2D(pool_size=(2, 2))(x)
     x = Dropout(dropout_rate)(x)
 
     # Second convolutional block with MaxPooling
-    x = Conv2D(nb_filters * 2, kernel_size, activation='relu')(x)  # Increased filters
+    x = Conv2D(nb_filters * 2, kernel_size, activation='relu')(x)
     x = BatchNormalization()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)  # 添加 MaxPooling 层
+    x = MaxPooling2D(pool_size=(2, 2))(x)
     x = Dropout(dropout_rate)(x)
 
     # Third convolutional block with MaxPooling
@@ -67,13 +58,12 @@ def create_optimized_model(input_shape=(128, 96, 1), nb_filters=128, kernel_size
 
     # Flatten and Dense layers
     x = Flatten()(x)
-    x = Dense(512, activation='relu')(x)  # Increased neurons
+    x = Dense(256, activation='relu')(x)
     x = BatchNormalization()(x)
     x = Dropout(dropout_rate)(x)
 
     # Output layer for angle regression
     output = Dense(1, activation='linear')(x)
-
     model = Model(inputs=input_layer, outputs=output)
     return model
 
@@ -81,9 +71,9 @@ def create_optimized_model(input_shape=(128, 96, 1), nb_filters=128, kernel_size
 model = create_optimized_model(input_shape=(128, 96, 1))
 model.summary()
 
-optimizer = Adam(learning_rate=1e-4)
+# Compile the model
+optimizer = Adam(learning_rate=1e-3)
 model.compile(loss=angle_error_regression, optimizer=optimizer)
-
 
 # Training parameters
 batch_size = 32
@@ -95,14 +85,12 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 # Define callbacks for training
-checkpointer = ModelCheckpoint(
-    filepath=os.path.join(output_folder, model_name + '.hdf5'),
-    save_best_only=True
-)
+checkpointer = ModelCheckpoint(filepath=os.path.join(output_folder, model_name + '.hdf5'), save_best_only=True)
 early_stopping = EarlyStopping(patience=8)
 tensorboard = TensorBoard()
 
-# Model training
+
+# Train the model
 model.fit(
     X_train, y_train,
     batch_size=batch_size,
