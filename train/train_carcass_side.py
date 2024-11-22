@@ -22,7 +22,7 @@ image_dir = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\STANDARDIZED\cut_
 csv_path = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\dataset_image_rotation_data.csv"
 
 # Load and prepare the data
-images, labels = load_and_pair_data(image_dir, csv_path, target_size=(96, 128))
+images,labels,origin_images = load_and_pair_data(image_dir, csv_path, target_size=(96, 128))
 
 # Convert labels to a NumPy array of strings for compatibility
 labels = np.array(labels, dtype=str)
