@@ -4,6 +4,7 @@ import sys
 import cv2
 import numpy as np
 import random
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 from keras.layers import BatchNormalization, Dense, Dropout, Flatten, Input, Conv2D, MaxPooling2D
 from keras.models import Model
@@ -21,19 +22,23 @@ image_dir = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\STANDARDIZED\imag
 csv_path = r"C:\Users\xuyan\RotNet\data\RotationAngle\DATASET\dataset_image_rotation_data.csv"
 
 # Load and prepare the data
-images, angles = load_and_pair_data(image_dir, csv_path, target_size=(96, 128))
+images, angles,origin_images = load_and_pair_data(image_dir, csv_path, target_size=(96, 128))
 
 X_train, X_test, y_train, y_test = manual_train_test_split(images, angles, test_size=0.2)
+print(f"X_test shape: {X_test.shape}")
+print(f"y_test shape: {y_test.shape}")
+# Split data into training and testing sets
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
 # Ensure data is in float32 format for compatibility with ImageDataGenerator
 X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
+X_val = X_val.astype('float32')
 
 # Display data shapes for verification
 print(f"Training data shape: {X_train.shape}")
-print(f"Testing data shape: {X_test.shape}")
+print(f"Testing data shape: {X_val.shape}")
 print(f"Training labels shape: {y_train.shape}")
-print(f"Testing labels shape: {y_test.shape}")
+print(f"Testing labels shape: {y_val.shape}")
 
 # Custom data generator for rotation augmentation
 def custom_data_generator(X, y, batch_size, rotation_range=0):
@@ -66,7 +71,7 @@ def custom_data_generator(X, y, batch_size, rotation_range=0):
             yield np.array(augmented_X), np.array(augmented_y)
 
 # Model configuration
-model_name = 'rotnet_carcass_regression'
+model_name = 'rotnet_carcass_regression_color'
 
 
 def create_optimized_model(input_shape=(128, 96, 1), nb_filters=128, kernel_size=(3, 3), dropout_rate=0.3):
@@ -125,7 +130,7 @@ model.compile(loss=angle_error_regression, optimizer=optimizer)
 
 # Training parameters
 batch_size = 64
-nb_epoch = 120
+nb_epoch = 50
 
 # Check if output folder exists and create it if not
 output_folder = 'models'
@@ -134,7 +139,7 @@ if not os.path.exists(output_folder):
 
 # Define callbacks for training
 checkpointer = ModelCheckpoint(filepath=os.path.join(output_folder, model_name + '.hdf5'), save_best_only=True)
-early_stopping = EarlyStopping(patience=15)
+early_stopping = EarlyStopping(patience=8)
 tensorboard = TensorBoard()
 
 # Train the model with custom data generator
@@ -142,7 +147,7 @@ model.fit(
     custom_data_generator(X_train, y_train, batch_size=batch_size),
     steps_per_epoch=len(X_train) // batch_size,
     epochs=nb_epoch,
-    validation_data=(X_test, y_test),
+    validation_data=(X_val, y_val),
     shuffle=True,
     verbose=1,
     callbacks=[checkpointer, early_stopping, tensorboard]
