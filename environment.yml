@@ -1,138 +1,24 @@
-name: rotnet
+name: tensorflow_env  # The name of the Conda environment
 channels:
-  - conda-forge
-  - defaults
-  - https://repo.anaconda.com/pkgs/main
-  - https://repo.anaconda.com/pkgs/r
-  - https://repo.anaconda.com/pkgs/msys2
+  - defaults           # Default channel for Conda packages
+  - conda-forge         # Conda-forge channel for additional community-maintained packages
 dependencies:
-  - backcall
-  - backports
-  - backports.functools_lru_cache
-  - blas
-  - ca-certificates
-  - certifi
-  - colorama
-  - cudatoolkit
-  - cudnn
-  - cycler
-  - decorator
-  - entrypoints
-  - freeglut
-  - freetype
-  - icu
-  - intel-openmp
-  - ipykernel
-  - ipython
-  - ipython_genutils
-  - jasper
-  - jedi
-  - jpeg
-  - jupyter_client
-  - jupyter_core
-  - kiwisolver
-  - lerc
-  - libblas
-  - libcblas
-  - libclang
-  - libdeflate
-  - liblapack
-  - liblapacke
-  - libopencv
-  - libpng
-  - libprotobuf
-  - libsodium
-  - libsqlite
-  - libtiff
-  - libwebp
-  - libwebp-base
-  - libzlib
-  - matplotlib
-  - matplotlib-base
-  - mkl
-  - mkl-service
-  - mkl_fft
-  - mkl_random
-  - nest-asyncio
-  - numpy
-  - numpy-base
-  - olefile
-  - opencv
-  - openssl
-  - pandas
-  - parso
-  - pickleshare
-  - pillow
-  - pip
-  - prompt-toolkit
-  - py-opencv
-  - pygments
-  - pyparsing
-  - pyqt
-  - pyqt-impl
-  - pyqt5-sip
-  - pyqtchart
-  - pyqtwebengine
-  - python
-  - python-dateutil
-  - python_abi
-  - pytz
-  - pywin32
-  - pyzmq
-  - qt
-  - setuptools
-  - sqlite
-  - tk
-  - tornado
-  - traitlets
-  - ucrt
-  - vc
-  - vc14_runtime
-  - vs2015_runtime
-  - wcwidth
-  - wheel
-  - wincertstore
-  - xz
-  - zeromq
-  - zlib
-  - zstd
+  # Python and core libraries
+  - python=3.9         # Python version 3.9, compatible with TensorFlow 2.10
+  - tensorflow=2.10.0  # TensorFlow version 2.10, for deep learning
+  - keras=2.10.0       # Keras version 2.10, used with TensorFlow
+  - numpy              # NumPy for numerical operations
+  - pandas             # Pandas for data manipulation
+  - matplotlib         # Matplotlib for data visualization
+  - scikit-learn       # Scikit-learn for machine learning and data preprocessing
+  - opencv             # OpenCV for computer vision tasks
+
+  # GPU dependencies
+  - cudatoolkit=11.2   # CUDA Toolkit 11.2, required for GPU acceleration
+  - cudnn=8.1          # cuDNN 8.1, required for TensorFlow GPU support
+  # Note: Ensure that your GPU is compatible with CUDA 11.2 and cuDNN 8.1.
+  # For compatibility details, check: https://www.tensorflow.org/install/source#gpu
+
+  # pip-installed dependencies
   - pip:
-      - absl-py
-      - astunparse
-      - cached-property
-      - cachetools
-      - charset-normalizer
-      - clang
-      - dataclasses
-      - flatbuffers
-      - gast
-      - google-auth
-      - google-auth-oauthlib
-      - google-pasta
-      - grpcio
-      - h5py
-      - idna
-      - importlib-metadata
-      - keras
-      - keras-preprocessing
-      - markdown
-      - oauthlib
-      - opt-einsum
-      - protobuf
-      - pyasn1
-      - pyasn1-modules
-      - requests
-      - requests-oauthlib
-      - rsa
-      - six
-      - tensorboard
-      - tensorboard-data-server
-      - tensorboard-plugin-wit
-      - tensorflow
-      - tensorflow-estimator
-      - termcolor
-      - typing-extensions
-      - urllib3
-      - werkzeug
-      - wrapt
-      - zipp
+      - keras-tuner    # Keras Tuner for hyperparameter optimization
