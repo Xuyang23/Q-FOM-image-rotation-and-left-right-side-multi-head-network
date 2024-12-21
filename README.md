@@ -1,7 +1,3 @@
-以下是根据你的需求编写的 `README.md` 文件：
-
----
-
 # TensorFlow Environment Setup and Project Instructions
 
 ## Environment Setup
